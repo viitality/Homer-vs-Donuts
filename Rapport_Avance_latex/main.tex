@@ -35,6 +35,7 @@
 \usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
 %Pour les galerie d'images
 \usepackage{subfig}
+\usepackage{placeins}
 
 %====================== INFORMATION ET REGLES ======================
 
@@ -71,12 +72,13 @@ pdfstartview={FitH}}					% ajuste la page à la largueur de l'écran
 %ne pas numéroter cette page
 \thispagestyle{empty}
 
+\Large
 \tableofcontents
-\thispagestyle{empty}
-\setcounter{page}{0}
+%\thispagestyle{empty}
+%\setcounter{page}{0}
 %ne pas numéroter le sommaire
 
-\newpage
+%\newpage
 
 %espacement entre les lignes d'un tableau
 \renewcommand{\arraystretch}{1.5}
@@ -90,18 +92,24 @@ pdfstartview={FitH}}					% ajuste la page à la largueur de l'écran
 \newpage
 \makeatletter\@addtoreset{section}{part}\makeatother
 \renewcommand{\thesection}{\arabic{section}}
-
+\normalsize
 \input{./partie1.tex}
 
 \input{./partie2.tex}
 
 \input{./partie3.tex}
 
+\input{./conclusion.tex}
 
 
 %récupérer les citation avec "/footnotemark"
 \nocite{*}
 
+%choix du style de la biblio
+\bibliographystyle{plain}
+%inclusion de la biblio
+\bibliography{Bibliographie.bib}
+%voir wiki pour plus d'information sur la syntaxe des entrées d'une bibliographie
 
 
 \end{document}
