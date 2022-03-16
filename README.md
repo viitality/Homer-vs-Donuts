@@ -1,6 +1,6 @@
 # Homer-vs-Donuts
 ## Introduction
-Ce repository est l'hébergement d'un projet effectué par Myriam Aarab, Mohamed Benelkater, Alexandre Corriou et Alexia Prevot, sous la tutelle de Jeanne Barthelemy.
+Ce repository est l'hébergement d'un projet effectué par Mariam Aarab, Mohamed Benelkater, Alexandre Corriou et Alexia Prevot, sous la tutelle de Jeanne Barthelemy.
 
 ## Organisation des dossiers
 Il y a 3 grands dossiers :
