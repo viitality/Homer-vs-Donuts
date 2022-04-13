@@ -49,7 +49,7 @@ class Grid:
 			return True
 		return False
 
-	def homer_action(self, current_state, action):#probaprof -> 'homer_success_rate' à changer qui va etre une fonction qui depend de la case et de l'action donnée
+	def homer_action(self, current_state, action):
 		if action == "up":
 			actions_probas = [self.probas[str(current_state[0])+'_'+str(current_state[1])]["up"][a] for a in self.probas[str(current_state[0])+'_'+str(current_state[1])]["up"]]
 			return np.random.choice(self.action, p=actions_probas)
@@ -67,14 +67,16 @@ class Grid:
 
 	def get_next_state(self, current_state, action):
 		homer_decision = self.homer_action(current_state, action)
-		if homer_decision == "up":
+		if (homer_decision == "up"):
 			next_state = (current_state[0], current_state[1] - 1)
-		elif homer_decision == "down":
+		elif (homer_decision == "down"):
 			next_state = (current_state[0], current_state[1] + 1)
-		elif homer_decision == "left":
+		elif (homer_decision == "left"):
 			next_state = (current_state[0]-1, current_state[1])
-		elif homer_decision == "right":
+		elif (homer_decision == "right"):
 			next_state = (current_state[0]+1, current_state[1])
+		else:
+			next_state = current_state
 
 		if (next_state[0] >= 0) and (next_state[0] < self.size_board[0]):
 			if (next_state[1] >= 0) and (next_state[1] < self.size_board[1]):
@@ -99,6 +101,14 @@ class Agent:
 				self.Q_values[(i, j)] = {}
 				for a in self.actions:
 					self.Q_values[(i, j)][a] = 0
+					if i == 0:
+						self.Q_values[(i, j)]["left"] = -1e6
+					if i == self.grid.size_board[0]-1:
+						self.Q_values[(i, j)]["right"] = -1e6
+					if j == 0:
+						self.Q_values[(i, j)]["up"] = -1e6
+					if j == self.grid.size_board[1]-1:
+						self.Q_values[(i, j)]["down"] = -1e6
 
 	def select_action(self, exploitation = False):
 		action = ""

@@ -146,7 +146,7 @@ for line in range(grid_size[1]):
             probas = probas / np.sum(probas)
             i  = np.argmax(probas)
             probas[i] += 0.5 # permet d'assurer que la probabilité de prendre la bonne action est >= 0.5
-            probas = list(probas / np.sum(probas))
+            probas = list(probas / np.sum(probas)) # normalisation
             probasDirectory[spot_id][action] = {}
             probasDirectory[spot_id][action][action] = max(probas)
             probas.remove(max(probas))
@@ -177,6 +177,7 @@ while running:
             running = False
         elif event.type == py.VIDEORESIZE:
             resolutionEcran = event.size
+
             background.reload()
             display_images.reload()
         elif event.type == py.KEYDOWN:
