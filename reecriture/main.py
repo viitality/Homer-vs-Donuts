@@ -3,6 +3,7 @@ import time
 import math
 
 import pygame as py
+import numpy as np
 
 import MarkovProcess as mp
 
@@ -130,9 +131,34 @@ win_states = [(5,0)]
 lose_states = [(0,1),(2,2),(3,1),(4,0),(5,4),(6,2)]
 obstacle_states = []
 start = (0,4)
-homer_success_rate = [0.8, 0.1, 0.1]
+#homer_success_rate = [0.8, 0.1, 0.1]
 
-homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states, homer_success_rate)
+available_actions = ['up', 'down', 'left', 'right']
+#======= Initialisation des probabilités de transition (probabilité pour Homer de se tromper):
+    # /!\ Varie entre chaque exécution du code, mais pas entre chaque partie lors d'une même exécution
+probasDirectory = {}
+for line in range(grid_size[1]):
+    for column in range(grid_size[0]):
+        spot_id = str(line)+'_'+str(column)
+        probasDirectory[spot_id] = {}
+        for action in available_actions:
+            probas = np.random.rand(4)
+            probas = probas / np.sum(probas)
+            i  = np.argmax(probas)
+            probas[i] += 0.5 # permet d'assurer que la probabilité de prendre la bonne action est >= 0.5
+            probas = list(probas / np.sum(probas))
+            probasDirectory[spot_id][action] = {}
+            probasDirectory[spot_id][action][action] = max(probas)
+            probas.remove(max(probas))
+            for x in available_actions:
+                if x != action:
+                    proba = np.random.choice(probas)
+                    probasDirectory[spot_id][action][x] = proba
+                    probas.remove(proba)
+            print(spot_id, action, probasDirectory[spot_id][action])
+
+
+homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states, probasDirectory)
 homer_agent = mp.Agent(start, homer_grid)
 
 #########################################################################################
@@ -164,10 +190,13 @@ while running:
                 print("you pressed e")
                 homer_agent.play_to_learn_step2()
             elif event.key == py.K_l:
+                print("you pressed l")
                 learning = True
             elif event.key == py.K_m:
+                print("you pressed m")
                 learning2 = True
             elif event.key == py.K_s:
+                print("you pressed s")
                 learning = False
                 learning2 = False
             elif event.key == py.K_COLON:

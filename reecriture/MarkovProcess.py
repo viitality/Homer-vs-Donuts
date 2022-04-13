@@ -2,39 +2,39 @@ import numpy as np
 
 
 class Grid:
-	def __init__(self, size, win_states, lose_states, obstacle_states, homer_success_rate):
+	def __init__(self, size, win_states, lose_states, obstacle_states, probasDirectory):
 		self.size_board = size #tuple
 		self.win_states = win_states
 		self.lose_states= lose_states
 		self.obstacle_states = obstacle_states
-		self.homer_success_rate = homer_success_rate
+		#self.homer_success_rate = homer_success_rate
 		self.action = ["up", "down", "left", "right"]
-		self.probas = self.create_probas(self.action)
+		self.probas = probasDirectory
 
 
-	def create_probas(self,action):
+	"""def create_probas(self,action):
 		#======= Initialisation des probabilités de transition (probabilité pour Homer de se tromper):
 		# /!\ Varie entre chaque exécution du code, mais pas entre chaque partie lors d'une même exécution
-		probasDirectory = {}
-		for line in range(self.size[0]):
-			for column in range(self.size[1]):
-				spot_id = str(line)+'_'+str(column)
-				probasDirectory[spot_id] = {}
-				for action in self.action:
-					probas = np.random.rand(4)
-					probas = probas / np.sum(probas)
-					i  = np.argmax(probas)
-					probas[i] += 0.5 # permet d'assurer que la probabilité de prendre la bonne action est >= 0.5
-					probas = list(probas / np.sum(probas))
-					probasDirectory[spot_id][action] = {}
-					probasDirectory[spot_id][action][action] = max(probas)
-					probas.remove(max(probas))
-					for x in self.action:
-						if x != action:
-							proba = np.random.choice(probas)
-							probasDirectory[spot_id][action][x] = proba
-							probas.remove(proba)
-		return probasDirectory
+	probasDirectory = {}
+	for line in range(self.size[0]):
+		for column in range(self.size[1]):
+			spot_id = str(line)+'_'+str(column)
+			probasDirectory[spot_id] = {}
+			for action in self.action:
+				probas = np.random.rand(4)
+				probas = probas / np.sum(probas)
+				i  = np.argmax(probas)
+				probas[i] += 0.5 # permet d'assurer que la probabilité de prendre la bonne action est >= 0.5
+				probas = list(probas / np.sum(probas))
+				probasDirectory[spot_id][action] = {}
+				probasDirectory[spot_id][action][action] = max(probas)
+				probas.remove(max(probas))
+				for x in self.action:
+					if x != action:
+						proba = np.random.choice(probas)
+						probasDirectory[spot_id][action][x] = proba
+						probas.remove(proba)
+		return probasDirectory"""
 
 	def get_reward(self, current_state):
 		if current_state in self.win_states:
@@ -49,20 +49,24 @@ class Grid:
 			return True
 		return False
 
-	def homer_action(self,action):#probaprof -> 'homer_success_rate' à changer qui va etre une fonction qui depend de la case et de l'action donnée
+	def homer_action(self, current_state, action):#probaprof -> 'homer_success_rate' à changer qui va etre une fonction qui depend de la case et de l'action donnée
 		if action == "up":
-			return np.random.choice(self.action, p=self.homer_success_rate)
+			actions_probas = [self.probas[str(current_state[0])+'_'+str(current_state[1])]["up"][a] for a in self.probas[str(current_state[0])+'_'+str(current_state[1])]["up"]]
+			return np.random.choice(self.action, p=actions_probas)
 		if action == "down":
-			return np.random.choice(self.action, p=self.homer_success_rate)
+			actions_probas = [self.probas[str(current_state[0])+'_'+str(current_state[1])]["down"][a] for a in self.probas[str(current_state[0])+'_'+str(current_state[1])]["down"]]
+			return np.random.choice(self.action, p=actions_probas)
 		if action == "left":
-			return np.random.choice(self.action, p=self.homer_success_rate)
+			actions_probas = [self.probas[str(current_state[0])+'_'+str(current_state[1])]["left"][a] for a in self.probas[str(current_state[0])+'_'+str(current_state[1])]["left"]]
+			return np.random.choice(self.action, p=actions_probas)
 		if action == "right":
-			return np.random.choice(self.action, p=self.homer_success_rate)
+			actions_probas = [self.probas[str(current_state[0])+'_'+str(current_state[1])]["right"][a] for a in self.probas[str(current_state[0])+'_'+str(current_state[1])]["right"]]
+			return np.random.choice(self.action, p=actions_probas)
 		else:
 			raise Exception("fct homer_action did not get a correct parameter :",action)
 
 	def get_next_state(self, current_state, action):
-		homer_decision = self.homer_action(action)
+		homer_decision = self.homer_action(current_state, action)
 		if homer_decision == "up":
 			next_state = (current_state[0], current_state[1] - 1)
 		elif homer_decision == "down":
