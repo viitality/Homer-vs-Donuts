@@ -133,32 +133,8 @@ obstacle_states = []
 start = (0,4)
 #homer_success_rate = [0.8, 0.1, 0.1]
 
-available_actions = ['up', 'down', 'left', 'right']
-#======= Initialisation des probabilités de transition (probabilité pour Homer de se tromper):
-    # /!\ Varie entre chaque exécution du code, mais pas entre chaque partie lors d'une même exécution
-probasDirectory = {}
-for line in range(grid_size[1]):
-    for column in range(grid_size[0]):
-        spot_id = str(line)+'_'+str(column)
-        probasDirectory[spot_id] = {}
-        for action in available_actions:
-            probas = np.random.rand(4)
-            probas = probas / np.sum(probas)
-            i  = np.argmax(probas)
-            probas[i] += 0.5 # permet d'assurer que la probabilité de prendre la bonne action est >= 0.5
-            probas = list(probas / np.sum(probas)) # normalisation
-            probasDirectory[spot_id][action] = {}
-            probasDirectory[spot_id][action][action] = max(probas)
-            probas.remove(max(probas))
-            for x in available_actions:
-                if x != action:
-                    proba = np.random.choice(probas)
-                    probasDirectory[spot_id][action][x] = proba
-                    probas.remove(proba)
-            print(spot_id, action, probasDirectory[spot_id][action])
 
-
-homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states, probasDirectory)
+homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states)
 homer_agent = mp.Agent(start, homer_grid)
 
 #########################################################################################
