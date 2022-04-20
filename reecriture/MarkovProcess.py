@@ -16,8 +16,8 @@ class Grid:
 		#======= Initialisation des probabilités de transition (probabilité pour Homer de se tromper):
 		# /!\ Varie entre chaque exécution du code, mais pas entre chaque partie lors d'une même exécution
 		probasDirectory = {}
-		for line in range(self.size[0]):
-			for column in range(self.size[1]):
+		for line in range(self.size_board[0]):
+			for column in range(self.size_board[1]):
 				spot_id = str(line)+'_'+str(column)
 				probasDirectory[spot_id] = {}
 				for action in self.action:
@@ -34,6 +34,7 @@ class Grid:
 							proba = np.random.choice(probas)
 							probasDirectory[spot_id][action][x] = proba
 							probas.remove(proba)
+					print(spot_id, action, probasDirectory[spot_id][action])
 			return probasDirectory
 
 	def get_reward(self, current_state):
@@ -101,7 +102,8 @@ class Agent:
 				self.Q_values[(i, j)] = {}
 				for a in self.actions:
 					self.Q_values[(i, j)][a] = 0
-					if i == 0: #si on est au bord, on met une proba extreme pour ne pas qu'il choisisse cette action
+					#si on est au bord, on met une proba extreme pour ne pas qu'il choisisse cette action
+					if i == 0: 
 						self.Q_values[(i, j)]["left"] = -1e6
 					if i == self.grid.size_board[0]-1:
 						self.Q_values[(i, j)]["right"] = -1e6
