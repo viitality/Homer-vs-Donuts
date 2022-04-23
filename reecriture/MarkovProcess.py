@@ -50,41 +50,30 @@ class Grid:
 		return False
 
 	def homer_action(self, current_state, action):
-		if str(current_state[0])+'_'+str(current_state[1]) not in self.probas:
-			print("test")
-			if current_state[0] < 0:
-				current_state[0]=0
-			elif current_state[1] < 0:
-				current_state[1]=0
-			elif current_state[0] >= self.size_board[0]:
-				current_state[0]=self.size_board[0]-1
-			elif current_state[1] >= self.size_board[1]:
-				current_state[1]=self.size_board[1]-1
-		print(str(current_state[0])+'_'+str(current_state[1]))
 		if action == "up":
-			actions_probas = [self.probas[str(current_state[0])+'_'+str(current_state[1])]["up"][a] for a in self.probas[str(current_state[0])+'_'+str(current_state[1])]["up"]]
+			actions_probas = [self.probas[str(current_state[1])+'_'+str(current_state[0])]["up"][a] for a in self.action]
 			return np.random.choice(self.action, p=actions_probas)
 		if action == "down":
-			actions_probas = [self.probas[str(current_state[0])+'_'+str(current_state[1])]["down"][a] for a in self.probas[str(current_state[0])+'_'+str(current_state[1])]["down"]]
+			actions_probas = [self.probas[str(current_state[1])+'_'+str(current_state[0])]["down"][a] for a in self.action]
 			return np.random.choice(self.action, p=actions_probas)
 		if action == "left":
-			actions_probas = [self.probas[str(current_state[0])+'_'+str(current_state[1])]["left"][a] for a in self.probas[str(current_state[0])+'_'+str(current_state[1])]["left"]]
+			actions_probas = [self.probas[str(current_state[1])+'_'+str(current_state[0])]["left"][a] for a in self.action]
 			return np.random.choice(self.action, p=actions_probas)
 		if action == "right":
-			actions_probas = [self.probas[str(current_state[0])+'_'+str(current_state[1])]["right"][a] for a in self.probas[str(current_state[0])+'_'+str(current_state[1])]["right"]]
+			actions_probas = [self.probas[str(current_state[1])+'_'+str(current_state[0])]["right"][a] for a in self.action]
 			return np.random.choice(self.action, p=actions_probas)
 		else:
 			raise Exception("fct homer_action did not get a correct parameter :",action)
 
 	def get_next_state(self, current_state, action):
 		homer_decision = self.homer_action(current_state, action)
-		if (homer_decision == "left"):
+		if (homer_decision == "up"):
 			next_state = (current_state[0], current_state[1] - 1)
-		elif (homer_decision == "right"):
-			next_state = (current_state[0], current_state[1] + 1)
-		elif (homer_decision == "up"):
-			next_state = (current_state[0]-1, current_state[1])
 		elif (homer_decision == "down"):
+			next_state = (current_state[0], current_state[1] + 1)
+		elif (homer_decision == "left"):
+			next_state = (current_state[0]-1, current_state[1])
+		elif (homer_decision == "right"):
 			next_state = (current_state[0]+1, current_state[1])
 		else:
 			next_state = current_state
@@ -112,8 +101,16 @@ class Agent:
 				self.Q_values[(i, j)] = {}
 				for a in self.actions:
 					self.Q_values[(i, j)][a] = 0
+					if i == 0:
+						self.Q_values[(i, j)]["left"] = -1e6
+					if i == self.grid.size_board[0]-1:
+						self.Q_values[(i, j)]["right"] = -1e6
+					if j == 0:
+						self.Q_values[(i, j)]["up"] = -1e6
+					if j == self.grid.size_board[1]-1:
+						self.Q_values[(i, j)]["down"] = -1e6
 
-	def select_action(self, exploitation = False):
+	def select_action(self, exploitation = False): #voir softmax
 		action = ""
 		if np.random.uniform(0,1) > self.exploration_rate or exploitation: # exploitation
 			max_next_reward = -100
@@ -124,7 +121,7 @@ class Agent:
 					max_next_reward = next_reward
 
 		if action == "": # exploration or no best choice
-			action = np.random.choice(self.actions)
+			action = np.random.choice(self.actions)  # avec proba égale à softmax de toutes les Qvalues
 
 		return action
 
