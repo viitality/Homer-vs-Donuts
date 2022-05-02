@@ -101,14 +101,14 @@ class Agent:
 				self.Q_values[(i, j)] = {}
 				for a in self.actions:
 					self.Q_values[(i, j)][a] = 0
-					if i == 0:
-						self.Q_values[(i, j)]["left"] = -1e6
-					if i == self.grid.size_board[0]-1:
-						self.Q_values[(i, j)]["right"] = -1e6
-					if j == 0:
-						self.Q_values[(i, j)]["up"] = -1e6
-					if j == self.grid.size_board[1]-1:
-						self.Q_values[(i, j)]["down"] = -1e6
+					#if i == 0:
+					#	self.Q_values[(i, j)]["left"] = -1e6
+					#if i == self.grid.size_board[0]-1:
+					#	self.Q_values[(i, j)]["right"] = -1e6
+					#if j == 0:
+					#	self.Q_values[(i, j)]["up"] = -1e6
+					#if j == self.grid.size_board[1]-1:
+					#	self.Q_values[(i, j)]["down"] = -1e6
 
 	def select_action(self, exploitation = False): #voir softmax
 		action = ""

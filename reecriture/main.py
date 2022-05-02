@@ -14,6 +14,7 @@ greenColor = (0,255,0)
 blackColor = (0, 0, 0)
 blueColor = (80, 150, 255)
 whiteColor = (230,230,230)
+purpleColor = (140, 50, 160)
 
 py.init()
 clock = py.time.Clock()
@@ -34,7 +35,7 @@ class Background(py.sprite.Sprite):
         self.reload()
 
     def reload(self):
-        img_background = py.image.load("img/donut_earth.png")
+        img_background = py.image.load("img/fond.png") # ou pour l'original : "img/donut_earth.png"
         self.img_background = py.transform.scale(img_background,resolutionEcran)
         self.size_node = min((resolutionEcran[0]-self.leftmargin-self.rightmargin)/self.grid_size[0],
                              (resolutionEcran[1]-self.topmargin-self.bottommargin)/self.grid_size[1])
@@ -82,6 +83,7 @@ class Display_images():
         self.homer_img = self.load_img(name="homer.png")
         self.donut_img = self.load_img(name="donut.png")
         self.characters_img = self.load_img(nb=len(self.homer_grid.lose_states))
+    
 
     def load_img(self,nb=1,name=""):
         if name != "":
@@ -122,6 +124,27 @@ class Display_images():
             surface.blit(self.donut_img, [xx,yy])
 
 
+def draw_text(surf, text, size, x, y, color=blackColor):
+    """
+    Petite fonction pour la représentation graphique avec pygame
+    :param surf: surface sur laquelle écrire
+    :param text: texte à écrire
+    :param size: taille de police
+    :param x: coordonnée x de l'emplacement du texte
+    :param y: coordonnée y de l'emplacement du texte
+    :param color: couleur du texte
+    """
+    """
+    police = py.font.SysFont("monospace" ,15)
+    image_texte = police.render (text, 1 , color)
+    surface.blit(image_texte, (320,240))
+    py.display.flip()
+    """
+    font = py.font.Font(py.font.match_font('arial'), size)
+    text_surface = font.render(text, True, color) # white for color true for anti aliased
+    text_rect = text_surface.get_rect() 
+    text_rect.midtop = (x, y)
+    surf.blit(text_surface, text_rect)  # le text surface est sur le text rectangle
 
 
 #########################################################################################
@@ -155,7 +178,7 @@ for line in range(grid_size[1]):
                     proba = np.random.choice(probas)
                     probasDirectory[spot_id][action][x] = proba
                     probas.remove(proba)
-            print(spot_id, action, probasDirectory[spot_id][action])
+            #print(spot_id, action, probasDirectory[spot_id][action])
 
 
 homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states, probasDirectory)
@@ -216,6 +239,37 @@ while running:
     background.draw(windowSurface)
     display_Qvalues.draw(windowSurface)
     display_images.draw(windowSurface)
+    #affichage du titre
+    draw_text(windowSurface, "EAT DONUTS & AVOID ENEMIES!", 60, resolutionEcran[0] // 2, 10, blackColor)  # 18 est pour la taille
+    #py.display.flip() 
+
+    #affichage du score
+    draw_text(windowSurface, "Score :", 50, resolutionEcran[0] -130, resolutionEcran[1]//2 - 180, purpleColor) 
+    score=156
+    draw_text(windowSurface, str(score), 50, resolutionEcran[0] -130, resolutionEcran[1]//2 - 100, purpleColor) 
+
+    #affichage des touches
+    draw_text(windowSurface, "Caption :", 40, 70, 150, blackColor)  # taille, x, y
+    draw_text(windowSurface, "- enter : play_to_win", 20, 85, 210, blackColor)  
+    draw_text(windowSurface, "- a : play_to_learn", 20, 75, 250, blackColor)  
+    draw_text(windowSurface, "- z : play_to_learn_step", 20, 95, 290, blackColor)  
+    draw_text(windowSurface, "- e : play_to_learn_step2", 20, 100, 330, blackColor)  
+
+    """
+    font2 = py.font.SysFont('Keys : ', 50)
+    img2 = font2.render('Keys : ', True, blackColor)
+    windowSurface.blit(img2, (12, 160))
+    font3 = py.font.SysFont('a : play_to_learn', 25)
+    img3 = font3.render('a : play_to_learn', True, blackColor)
+    windowSurface.blit(img3, (12, 210))
+    font4 = py.font.SysFont('z : play_to_learn by step', 25)
+    img4 = font4.render('z : play_to_learn by step', True, blackColor)
+    windowSurface.blit(img4, (12, 260))
+    font5 = py.font.SysFont('e : play_to_learn by step2', 25)
+    img5 = font5.render('e : play_to_learn by step2', True, blackColor)
+    windowSurface.blit(img5, (12, 310)) 
+    """
+
     windowSurface.blit(arialFontFPS.render(f"{int(clock.get_fps())} FPS", True, blueColor), [5, 5])
     py.display.flip()
 
