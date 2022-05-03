@@ -1,6 +1,7 @@
 import os
 import time
 import math
+from os import path
 
 import pygame as py
 import numpy as np
