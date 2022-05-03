@@ -1,7 +1,6 @@
 import os
 import time
 import math
-from os import path
 
 import pygame as py
 import numpy as np
@@ -254,7 +253,9 @@ while running:
     draw_text(windowSurface, "- enter : play_to_win", 20, 85, 210, blackColor)  
     draw_text(windowSurface, "- a : play_to_learn", 20, 75, 250, blackColor)  
     draw_text(windowSurface, "- z : play_to_learn_step", 20, 95, 290, blackColor)  
-    draw_text(windowSurface, "- e : play_to_learn_step2", 20, 100, 330, blackColor)  
+    draw_text(windowSurface, "- e : play_to_learn_step2", 20, 100, 330, blackColor)
+    draw_text(windowSurface, "- l : apprentissage automatique", 20, 105, 370, blackColor)
+    draw_text(windowSurface, "- s : arrêt d'apprentissage", 20, 110, 410, blackColor)
 
     """
     font2 = py.font.SysFont('Keys : ', 50)
