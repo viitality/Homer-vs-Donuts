@@ -231,6 +231,8 @@ while running:
                 print(f"learning rate :{homer_agent.lr}")
             elif event.key == py.K_RETURN:
                 homer_agent.play_to_win()
+            elif event.key == py.K_ESCAPE:
+                running = False
                 
     if learning:
         homer_agent.play_to_learn()
@@ -249,11 +251,15 @@ while running:
     draw_text(windowSurface, str(score), 50, resolutionEcran[0] -130, resolutionEcran[1]//2 - 100, purpleColor) 
 
     #affichage des touches
-    draw_text(windowSurface, "Caption :", 40, 70, 150, blackColor)  # taille, x, y
+    draw_text(windowSurface, "Controls :", 40, 70, 150, blackColor)  # taille, x, y
     draw_text(windowSurface, "- enter : play_to_win", 20, 85, 210, blackColor)  
-    draw_text(windowSurface, "- a : play_to_learn", 20, 75, 250, blackColor)  
+    draw_text(windowSurface, "- a : play_to_learn", 20, 76, 250, blackColor)  
     draw_text(windowSurface, "- z : play_to_learn_step", 20, 95, 290, blackColor)  
-    draw_text(windowSurface, "- e : play_to_learn_step2", 20, 100, 330, blackColor)  
+    draw_text(windowSurface, "- e : play_to_learn_step2", 20, 100, 330, blackColor)
+    draw_text(windowSurface, "- l : apprentissage", 20, 75, 370, blackColor)
+    draw_text(windowSurface, "- s : arrêt d'apprentissage", 20, 102, 410, blackColor)
+    draw_text(windowSurface, "- * : learning_rate *2", 20, 85, 450, blackColor)
+    draw_text(windowSurface, "- / : learning_rate /2", 20, 85, 490, blackColor)
 
     """
     font2 = py.font.SysFont('Keys : ', 50)
