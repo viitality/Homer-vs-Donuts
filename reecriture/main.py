@@ -8,6 +8,8 @@ import numpy as np
 import MarkovProcess as mp
 
 
+
+
 resolutionEcran = (1200,700)
 FPS = 100
 greenColor = (0,255,0)
@@ -154,6 +156,7 @@ win_states = [(5,0)]
 lose_states = [(0,1),(2,2),(3,1),(4,0),(5,4),(6,2)]
 obstacle_states = []
 start = (0,4)
+reward = 0
 #homer_success_rate = [0.8, 0.1, 0.1]
 
 available_actions = ['up', 'down', 'left', 'right']
@@ -181,8 +184,8 @@ for line in range(grid_size[1]):
             #print(spot_id, action, probasDirectory[spot_id][action])
 
 
-homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states, probasDirectory)
-homer_agent = mp.Agent(start, homer_grid)
+homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states, probasDirectory,reward)
+homer_agent = mp.Agent(start, homer_grid,reward)
 
 #########################################################################################
 
@@ -205,22 +208,22 @@ while running:
             display_images.reload()
         elif event.type == py.KEYDOWN:
             if event.key == py.K_a:
-                print("you pressed a")
+                print("you pressed a") # Permer de jouer 1 partie accélérée à la fois 
                 homer_agent.play_to_learn()
             elif event.key == py.K_z:
-                print("you pressed z")
+                print("you pressed z") # Permet de jouer 1 partie pas à pas : les Q-values sont calculés à la fin de la partie
                 homer_agent.play_to_learn_step()
             elif event.key == py.K_e:
-                print("you pressed e")
+                print("you pressed e") # Permet de jouer 1 partie pas à pas : les Q-values sont calculés au cours de la partie
                 homer_agent.play_to_learn_step2()
             elif event.key == py.K_l:
-                print("you pressed l")
+                print("you pressed l") # Permet de jouer plusieurs parties accélérés : les Q-values sont calculés à la fin des parties
                 learning = True
             elif event.key == py.K_m:
-                print("you pressed m")
+                print("you pressed m") # Permet de jouer plusieurs parties accélérés : les Q-values sont calculés au cours des parties
                 learning2 = True
             elif event.key == py.K_s:
-                print("you pressed s")
+                print("you pressed s") 
                 learning = False
                 learning2 = False
             elif event.key == py.K_COLON:
@@ -247,7 +250,7 @@ while running:
 
     #affichage du score
     draw_text(windowSurface, "Score :", 50, resolutionEcran[0] -130, resolutionEcran[1]//2 - 180, purpleColor) 
-    score=156
+    score = 156
     draw_text(windowSurface, str(score), 50, resolutionEcran[0] -130, resolutionEcran[1]//2 - 100, purpleColor) 
 
     #affichage des touches

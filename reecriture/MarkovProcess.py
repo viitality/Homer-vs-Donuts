@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Grid:
-	def __init__(self, size, win_states, lose_states, obstacle_states, probasDirectory):
+	def __init__(self, size, win_states, lose_states, obstacle_states, probasDirectory,reward):
 		self.size_board = size #tuple
 		self.win_states = win_states
 		self.lose_states= lose_states
@@ -10,7 +10,7 @@ class Grid:
 		#self.homer_success_rate = homer_success_rate
 		self.action = ["up", "down", "left", "right"]
 		self.probas = probasDirectory
-
+		self.reward = reward
 
 	"""def create_probas(self,action):
 		#======= Initialisation des probabilités de transition (probabilité pour Homer de se tromper):
@@ -44,8 +44,8 @@ class Grid:
 		else:
 			return -1
 
-	def is_end(self, current_state):
-		if (current_state in self.win_states) or (current_state in self.lose_states):
+	def is_end(self, current_state,reward):  # Fonction qui vérifie si la partie est finie : si l'agent est sur les donnuts ou si il a touché des ennemis ou si le score est inférieur à -30
+		if (current_state in self.win_states) or (current_state in self.lose_states) or (reward <= -30):
 			return True
 		return False
 
@@ -86,7 +86,7 @@ class Grid:
 
 
 class Agent:
-	def __init__(self, starting_state, grid):
+	def __init__(self, starting_state, grid,reward):
 		self.starting_state = starting_state
 		self.current_state = starting_state
 		self.history_states = []
@@ -95,6 +95,7 @@ class Agent:
 		self.lr = 0.1
 		self.exploration_rate = 0.3
 		self.decay_gamma = 0.9
+		self.reward = reward
 		self.Q_values = {}
 		for i in range(self.grid.size_board[0]):
 			for j in range(self.grid.size_board[1]):
@@ -114,7 +115,7 @@ class Agent:
 		action = ""
 		if np.random.uniform(0,1) > self.exploration_rate or exploitation: # exploitation
 			max_next_reward = -100
-			for a in self.actions:
+			for a in self.actions: # On choisit la plus grande Q-value parmi les 4 de la position actuelle
 				next_reward = self.Q_values[self.current_state][a]
 				if next_reward >= max_next_reward:
 					action = a
@@ -125,8 +126,8 @@ class Agent:
 
 		return action
 
-	def get_max_Q(self,state):
-		if self.grid.is_end(state):
+	def get_max_Q(self,state,reward):
+		if self.grid.is_end(state,reward):
 			return self.grid.get_reward(state)
 		max_Q = -1
 		for a in self.actions:
@@ -138,27 +139,31 @@ class Agent:
 		action = self.select_action(exploitation=True)
 		self.current_state, homer_decision = self.grid.get_next_state(self.current_state, action)
 		print(f"You chose {action}, Homer did {homer_decision}")
-		if self.grid.is_end(self.current_state):
+		if self.grid.is_end(self.current_state,self.reward):
 			self.current_state = self.starting_state
 
 
 	def play_to_learn_step(self):
-		if not self.grid.is_end(self.current_state):
+		if not self.grid.is_end(self.current_state,self.reward):
 			action = self.select_action()
-			self.history_states.append([self.current_state, action])
+			self.history_states.append([self.current_state, action]) # On ajoue dans une liste une liste contenant : [position, action prise]
 			self.current_state,homer_decision = self.grid.get_next_state(self.current_state, action)
-			self.history_states[-1].append(self.grid.get_reward(self.current_state))
+			self.history_states[-1].append(self.grid.get_reward(self.current_state)) # On ajoue dans la liste la récompense reçue
 			print(f"You chose {action}, Homer did {homer_decision}")
+			self.reward = self.reward + self.grid.get_reward(self.current_state)
 		else:
+			# print("REWARD OF THIS GAME = ")
+			# print(self.reward)
+			self.reward = 0
 			reward = 0
 			previous_state = self.current_state
-			for history_state in reversed(self.history_states):
+			for history_state in reversed(self.history_states): # on parcourt le chemin en partant de la fin 
 				state = history_state[0]
 				action = history_state[1]
 				new_reward = history_state[2]
-				print(state,action,self.get_max_Q(previous_state))
-				print(self.lr*( new_reward + self.decay_gamma*self.get_max_Q(previous_state) - self.Q_values[state][action]))
-				self.Q_values[state][action] += self.lr*( new_reward + self.decay_gamma*self.get_max_Q(previous_state) - self.Q_values[state][action])
+				print(state,action,self.get_max_Q(previous_state,reward))
+				print(self.lr*( new_reward + self.decay_gamma*self.get_max_Q(previous_state,reward) - self.Q_values[state][action]))
+				self.Q_values[state][action] += self.lr*( new_reward + self.decay_gamma*self.get_max_Q(previous_state,reward) - self.Q_values[state][action])
 				previous_state = state
 
 			self.current_state = self.starting_state
@@ -166,22 +171,26 @@ class Agent:
 		
 	def play_to_learn(self):
 		self.current_state = self.starting_state
-		self.history_states = []
+		self.history_states = [] # on initilise une liste 
 		over = False
 		while not over:	
-			if not self.grid.is_end(self.current_state):
+			if not self.grid.is_end(self.current_state,self.reward): # si la partie n'est pas finis
 				action = self.select_action()
 				self.history_states.append([self.current_state, action])
 				self.current_state, homer_decision = self.grid.get_next_state(self.current_state, action)
 				self.history_states[-1].append(self.grid.get_reward(self.current_state))
+				self.reward = self.reward + self.grid.get_reward(self.current_state)
 			else:
+				# print("REWARD OF THIS GAME = ")
+				# print(self.reward)
+				self.reward = 0
 				reward = 0
 				previous_state = self.current_state
-				for history_state in reversed(self.history_states):
+				for history_state in reversed(self.history_states): # on parcourt le chemin en partant de la fin 
 					state = history_state[0]
 					action = history_state[1]
 					new_reward = history_state[2]
-					self.Q_values[state][action] += self.lr*( new_reward + self.decay_gamma*self.get_max_Q(previous_state) - self.Q_values[state][action])
+					self.Q_values[state][action] += self.lr*( new_reward + self.decay_gamma*self.get_max_Q(previous_state,reward) - self.Q_values[state][action])
 					previous_state = state
 				over = True
 		self.current_state = self.starting_state
@@ -192,7 +201,11 @@ class Agent:
 		previous_state = self.current_state
 		self.current_state,homer_decision = self.grid.get_next_state(self.current_state, action)
 		reward = self.grid.get_reward(self.current_state)
-		self.Q_values[previous_state][action] += self.lr*( reward + self.decay_gamma*self.get_max_Q(self.current_state) - self.Q_values[previous_state][action])
+		self.Q_values[previous_state][action] += self.lr*( reward + self.decay_gamma*self.get_max_Q(self.current_state,self.reward) - self.Q_values[previous_state][action])
 		print(f"You chose {action}, Homer did {homer_decision}")
-		if self.grid.is_end(self.current_state):
+		self.reward = self.reward + self.grid.get_reward(self.current_state)
+		if self.grid.is_end(self.current_state,self.reward):
 			self.current_state = self.starting_state
+			# print("REWARD OF THIS GAME = ")
+			# print(self.reward)
+			self.reward = 0
