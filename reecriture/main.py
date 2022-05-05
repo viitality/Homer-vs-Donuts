@@ -231,6 +231,8 @@ while running:
                 print(f"learning rate :{homer_agent.lr}")
             elif event.key == py.K_RETURN:
                 homer_agent.play_to_win()
+            elif event.key == py.K_ESCAPE:
+                running = False
                 
     if learning:
         homer_agent.play_to_learn()
