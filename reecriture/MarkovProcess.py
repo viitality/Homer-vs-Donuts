@@ -96,20 +96,13 @@ class Agent:
 		self.exploration_rate = 0.3
 		self.decay_gamma = 0.9
 		self.reward = reward
+		self.reward_history = reward #permet de récupérer le dernier score obtenu
 		self.Q_values = {}
 		for i in range(self.grid.size_board[0]):
 			for j in range(self.grid.size_board[1]):
 				self.Q_values[(i, j)] = {}
 				for a in self.actions:
 					self.Q_values[(i, j)][a] = 0
-					#if i == 0:
-					#	self.Q_values[(i, j)]["left"] = -1e6
-					#if i == self.grid.size_board[0]-1:
-					#	self.Q_values[(i, j)]["right"] = -1e6
-					#if j == 0:
-					#	self.Q_values[(i, j)]["up"] = -1e6
-					#if j == self.grid.size_board[1]-1:
-					#	self.Q_values[(i, j)]["down"] = -1e6
 
 	def select_action(self, exploitation = False): #voir softmax
 		action = ""
@@ -126,6 +119,9 @@ class Agent:
 
 		return action
 
+	def get_reward_main(self):
+		return self.reward
+
 	def get_max_Q(self,state,reward):
 		if self.grid.is_end(state,reward):
 			return self.grid.get_reward(state)
@@ -139,8 +135,10 @@ class Agent:
 		action = self.select_action(exploitation=True)
 		self.current_state, homer_decision = self.grid.get_next_state(self.current_state, action)
 		print(f"You chose {action}, Homer did {homer_decision}")
+		self.reward += self.grid.get_reward(self.current_state)
 		if self.grid.is_end(self.current_state,self.reward):
 			self.current_state = self.starting_state
+			self.reward = 0
 
 
 	def play_to_learn_step(self):
@@ -151,9 +149,10 @@ class Agent:
 			self.history_states[-1].append(self.grid.get_reward(self.current_state)) # On ajoue dans la liste la récompense reçue
 			print(f"You chose {action}, Homer did {homer_decision}")
 			self.reward = self.reward + self.grid.get_reward(self.current_state)
+			self.reward_history = self.reward
 		else:
-			# print("REWARD OF THIS GAME = ")
-			# print(self.reward)
+			print("REWARD OF THIS GAME = ")
+			print(self.reward)
 			self.reward = 0
 			reward = 0
 			previous_state = self.current_state
@@ -181,8 +180,8 @@ class Agent:
 				self.history_states[-1].append(self.grid.get_reward(self.current_state))
 				self.reward = self.reward + self.grid.get_reward(self.current_state)
 			else:
-				# print("REWARD OF THIS GAME = ")
-				# print(self.reward)
+				print("REWARD OF THIS GAME = ")
+				print(self.reward)
 				self.reward = 0
 				reward = 0
 				previous_state = self.current_state
@@ -206,6 +205,6 @@ class Agent:
 		self.reward = self.reward + self.grid.get_reward(self.current_state)
 		if self.grid.is_end(self.current_state,self.reward):
 			self.current_state = self.starting_state
-			# print("REWARD OF THIS GAME = ")
-			# print(self.reward)
+			print("REWARD OF THIS GAME = ")
+			print(self.reward)
 			self.reward = 0

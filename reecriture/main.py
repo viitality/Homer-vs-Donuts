@@ -247,10 +247,9 @@ while running:
     #affichage du titre
     draw_text(windowSurface, "EAT DONUTS & AVOID ENEMIES!", 60, resolutionEcran[0] // 2, 10, blackColor)  # 18 est pour la taille
     #py.display.flip() 
-
     #affichage du score
     draw_text(windowSurface, "Score :", 50, resolutionEcran[0] -130, resolutionEcran[1]//2 - 180, purpleColor) 
-    score = 156
+    score = homer_agent.get_reward_main()
     draw_text(windowSurface, str(score), 50, resolutionEcran[0] -130, resolutionEcran[1]//2 - 100, purpleColor) 
 
     #affichage des touches
