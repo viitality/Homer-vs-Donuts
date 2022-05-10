@@ -34,3 +34,6 @@ Les librairies python suivantes sont nécessaire au fonctionnement du programme 
 * pygame
 * numpy
 * os
+
+## Représentation graphique du jeu 
+<img width="758" alt="lr0,5" src="https://user-images.githubusercontent.com/92668243/167662800-e8d6104c-8a27-4148-90d7-a940dc12a32d.png">
