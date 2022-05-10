@@ -232,10 +232,31 @@ while running:
             elif event.key == py.K_ASTERISK:
                 homer_agent.lr *= 2
                 print(f"learning rate :{homer_agent.lr}")
+                
+            elif event.key == py.K_LEFT: #go left
+                homer_agent.current_state, homer_decision = homer_agent.grid.get_next_state(homer_agent.current_state, "left")
+                homer_agent.reward += homer_agent.grid.get_reward(homer_agent.current_state)
+            elif event.key == py.K_RIGHT: #go right
+                homer_agent.current_state, homer_decision = homer_agent.grid.get_next_state(homer_agent.current_state, "right")
+                homer_agent.reward += homer_agent.grid.get_reward(homer_agent.current_state)
+            elif event.key == py.K_UP: #go up
+                homer_agent.current_state, homer_decision = homer_agent.grid.get_next_state(homer_agent.current_state, "up")
+                homer_agent.reward += homer_agent.grid.get_reward(homer_agent.current_state)
+            elif event.key == py.K_DOWN: #go down
+                homer_agent.current_state, homer_decision = homer_agent.grid.get_next_state(homer_agent.current_state, "down")
+                homer_agent.reward += homer_agent.grid.get_reward(homer_agent.current_state)
+                
             elif event.key == py.K_RETURN:
                 homer_agent.play_to_win()
             elif event.key == py.K_ESCAPE:
                 running = False
+            if homer_agent.grid.is_end(homer_agent.current_state, homer_agent.reward):
+                homer_agent.reward = 0
+                homer_agent.current_state = homer_agent.starting_state
+                if homer_agent.current_state in homer_agent.grid.win_states:
+                    print("You win !")
+                else:
+                    print("You lose !")
                 
     if learning:
         homer_agent.play_to_learn()
@@ -245,7 +266,7 @@ while running:
     display_Qvalues.draw(windowSurface)
     display_images.draw(windowSurface)
     #affichage du titre
-    draw_text(windowSurface, "EAT DONUTS & AVOID ENEMIES!", 60, resolutionEcran[0] // 2, 10, blackColor)  # 18 est pour la taille
+    draw_text(windowSurface, "EAT DONUTS & AVOID ENEMIES!", 60, resolutionEcran[0] // 2, 10, blackColor)  # 10 est pour la taille
     #py.display.flip() 
     #affichage du score
     draw_text(windowSurface, "Score :", 50, resolutionEcran[0] -130, resolutionEcran[1]//2 - 180, purpleColor) 
