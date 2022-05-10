@@ -36,4 +36,5 @@ Les librairies python suivantes sont nécessaire au fonctionnement du programme 
 * os
 
 ## Représentation graphique du jeu 
-<img width="758" alt="lr0,5" src="https://user-images.githubusercontent.com/92668243/167662800-e8d6104c-8a27-4148-90d7-a940dc12a32d.png">
+<img width="1199" alt="Capture d’écran 2022-05-10 à 5 19 01 PM" src="https://user-images.githubusercontent.com/92668243/167663782-6ab11363-aa7e-4634-b4a6-06a300aca67b.png">
+
