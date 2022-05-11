@@ -10,14 +10,12 @@ Le problème est que Homer peut se tromper de mouvement et n'ira en conséquence
 
 ## Organisation des dossiers
 Il y a 4 grands dossiers :
-* HomerVSDonuts-learning
 * HomerVSDonuts-main
-* Rapport_latex1
-* Réécriture
+* Rapport_latex_Avance
+* Projet_final
 
-Le premier contient le code du jeu auquel a été rajouté notre code.
-Le deuxième contient uniquement le jeu original.
-Le troisième contient les rapports écrits en latex ainsi que toutes les images nécessaires pour.
+Le premier contient uniquement le jeu original.
+Le deuxième contient les rapports écrits en latex ainsi que toutes les images nécessaires pour.
 Enfin, le dernier contient une réécriture du projet qui a pour but de simplifier le code 
 
 ## Installation et lancement
