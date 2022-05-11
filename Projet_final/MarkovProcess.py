@@ -23,8 +23,8 @@ class Grid:
 
 	def is_end(self, current_state,reward):
 		''' Fonction qui vérifie si la partie est finie :
-		si l'agent est sur les donnuts ou si il a touché des ennemis ou si le score est inférieur à -20''' 
-		if (current_state in self.win_states) or (current_state in self.lose_states) or (reward <= -20):
+		si l'agent est sur les donnuts ou si il a touché des ennemis ou si le score est inférieur à -30''' 
+		if (current_state in self.win_states) or (current_state in self.lose_states) or (reward <= -30):
 			return True
 		return False
 
