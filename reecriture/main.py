@@ -27,6 +27,7 @@ py.display.set_caption("Homer VS Donuts")
 
 
 class Background(py.sprite.Sprite):
+    '''fonctions d'affichage'''
     def __init__(self,grid_size):
         super(Background, self).__init__()
         self.grid_size = grid_size
@@ -54,6 +55,7 @@ class Background(py.sprite.Sprite):
                     self.size_white,self.size_white))
 
 class Display_Qvalues():
+    '''Affichage des Qvalues (petits nombres dans les cases)'''
     def __init__(self, background, homer_agent):
         self.background = background
         self.homer_agent = homer_agent
@@ -75,6 +77,7 @@ class Display_Qvalues():
                 surface.blit(self.font.render(str("%.1f"%self.homer_agent.Q_values[x,y]["right"]), True, self.color), [xx+self.background.size_white-width-2, yy+self.background.size_white//2-height//2])
 
 class Display_images():
+    '''Affichage des images des personnages'''
     def __init__(self, background, homer_agent):
         self.background = background
         self.homer_agent = homer_agent
@@ -127,15 +130,13 @@ class Display_images():
 
 
 def draw_text(surf, text, size, x, y, color=blackColor):
-    """
-    Petite fonction pour la représentation graphique avec pygame
+    """Petite fonction pour la représentation graphique avec pygame
     :param surf: surface sur laquelle écrire
     :param text: texte à écrire
     :param size: taille de police
     :param x: coordonnée x de l'emplacement du texte
     :param y: coordonnée y de l'emplacement du texte
-    :param color: couleur du texte
-    """
+    :param color: couleur du texte"""
     """
     police = py.font.SysFont("monospace" ,15)
     image_texte = police.render (text, 1 , color)
@@ -151,19 +152,20 @@ def draw_text(surf, text, size, x, y, color=blackColor):
 
 #########################################################################################
 
-grid_size = (8,5)
-win_states = [(5,0)]
-lose_states = [(0,1),(2,2),(3,1),(4,0),(5,4),(6,2)]
-obstacle_states = []
-start = (0,4)
-reward = 0
-#homer_success_rate = [0.8, 0.1, 0.1]
+'''Initialisation de la grille'''
+grid_size = (8,5) # taille de la grille
+win_states = [(5,0)] # coordonnées des cases gagnantes (donuts)
+lose_states = [(0,1),(2,2),(3,1),(4,0),(5,4),(6,2)] # coordonnées des cases perdantes (ennemis)
+obstacle_states = [] # coordonnées des cases obstacles (pour une potentielle implémentation de murs)
+start = (0,4) # coordonnées de la case de départ
+reward = 0 #récompense initiale
 
-available_actions = ['up', 'down', 'left', 'right']
+
+available_actions = ['up', 'down', 'left', 'right'] # actions possibles (modulables au cas où on voudrait bouger en diagonale par exemple)
 #======= Initialisation des probabilités de transition (probabilité pour Homer de se tromper):
-    # /!\ Varie entre chaque exécution du code, mais pas entre chaque partie lors d'une même exécution
+# /!\ Varie entre chaque exécution du code, mais pas entre chaque partie lors d'une même exécution
 probasDirectory = {}
-for line in range(grid_size[1]):
+for line in range(grid_size[1]): #on crée un tableau de probabilités dont le type complet serait trop complexe à expliciter
     for column in range(grid_size[0]):
         spot_id = str(line)+'_'+str(column)
         probasDirectory[spot_id] = {}
@@ -183,7 +185,7 @@ for line in range(grid_size[1]):
                     probas.remove(proba)
             #print(spot_id, action, probasDirectory[spot_id][action])
 
-
+# initialisation de l'agent et de la grille
 homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states, probasDirectory,reward)
 homer_agent = mp.Agent(start, homer_grid,reward)
 
@@ -223,16 +225,20 @@ while running:
                 print("you pressed m") # Permet de jouer plusieurs parties accélérés : les Q-values sont calculés au cours des parties
                 learning2 = True
             elif event.key == py.K_s:
-                print("you pressed s") 
+                print("you pressed s") # arrêt des apprentissages accélérés
                 learning = False
                 learning2 = False
-            elif event.key == py.K_COLON:
-                homer_agent.lr /= 2
-                print(f"learning rate :{homer_agent.lr}")
-            elif event.key == py.K_ASTERISK:
-                homer_agent.lr *= 2
-                print(f"learning rate :{homer_agent.lr}")
-                
+            # on borne le learning_rate entre 0 et 1
+            elif event.key == py.K_COLON: # Change la vitesse d'apprentissage
+                if homer_agent.lr > 0.01:
+                    homer_agent.lr -= 0.1
+                print(f"learning rate :{format(homer_agent.lr, '.2f')}")
+            elif event.key == py.K_ASTERISK: # Change la vitesse d'apprentissage 
+                if homer_agent.lr < 0.9:
+                    homer_agent.lr += 0.1
+                print(f"learning rate :{format(homer_agent.lr, '.2f')}")
+            
+            #mouvements contrôlés par les flèches directionnelles du clavier
             elif event.key == py.K_LEFT: #go left
                 homer_agent.current_state, homer_decision = homer_agent.grid.get_next_state(homer_agent.current_state, "left")
                 homer_agent.reward += homer_agent.grid.get_reward(homer_agent.current_state)
@@ -246,18 +252,15 @@ while running:
                 homer_agent.current_state, homer_decision = homer_agent.grid.get_next_state(homer_agent.current_state, "down")
                 homer_agent.reward += homer_agent.grid.get_reward(homer_agent.current_state)
                 
-            elif event.key == py.K_RETURN:
+            elif event.key == py.K_RETURN: # Jouer pour gagner, exploitation des résultats précédents
                 homer_agent.play_to_win()
-            elif event.key == py.K_ESCAPE:
+            elif event.key == py.K_ESCAPE: # Quitter le jeu
                 running = False
             if homer_agent.grid.is_end(homer_agent.current_state, homer_agent.reward):
                 homer_agent.reward = 0
                 homer_agent.current_state = homer_agent.starting_state
-                if homer_agent.current_state in homer_agent.grid.win_states:
-                    print("You win !")
-                else:
-                    print("You lose !")
                 
+    # apprentissages en boucle, sans affichage étape par étape
     if learning:
         homer_agent.play_to_learn()
     elif learning2:
@@ -270,7 +273,7 @@ while running:
     #py.display.flip() 
     #affichage du score
     draw_text(windowSurface, "Score :", 50, resolutionEcran[0] -130, resolutionEcran[1]//2 - 180, purpleColor) 
-    score = homer_agent.get_reward_main()
+    score = homer_agent.reward
     draw_text(windowSurface, str(score), 50, resolutionEcran[0] -130, resolutionEcran[1]//2 - 100, purpleColor) 
 
     #affichage des touches

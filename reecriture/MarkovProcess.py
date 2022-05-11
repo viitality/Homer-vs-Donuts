@@ -1,5 +1,4 @@
 import numpy as np
-import pygame as py
 
 
 class Grid:
@@ -13,31 +12,8 @@ class Grid:
 		self.probas = probasDirectory
 		self.reward = reward
 
-	"""def create_probas(self,action):
-		#======= Initialisation des probabilités de transition (probabilité pour Homer de se tromper):
-		# /!\ Varie entre chaque exécution du code, mais pas entre chaque partie lors d'une même exécution
-	probasDirectory = {}
-	for line in range(self.size[0]):
-		for column in range(self.size[1]):
-			spot_id = str(line)+'_'+str(column)
-			probasDirectory[spot_id] = {}
-			for action in self.action:
-				probas = np.random.rand(4)
-				probas = probas / np.sum(probas)
-				i  = np.argmax(probas)
-				probas[i] += 0.5 # permet d'assurer que la probabilité de prendre la bonne action est >= 0.5
-				probas = list(probas / np.sum(probas))
-				probasDirectory[spot_id][action] = {}
-				probasDirectory[spot_id][action][action] = max(probas)
-				probas.remove(max(probas))
-				for x in self.action:
-					if x != action:
-						proba = np.random.choice(probas)
-						probasDirectory[spot_id][action][x] = proba
-						probas.remove(proba)
-		return probasDirectory"""
-
 	def get_reward(self, current_state):
+		'''retourne le score à ajouter à celui de l'agent'''
 		if current_state in self.win_states:
 			return 100
 		elif current_state in self.lose_states:
@@ -45,12 +21,18 @@ class Grid:
 		else:
 			return -1
 
-	def is_end(self, current_state,reward):  # Fonction qui vérifie si la partie est finie : si l'agent est sur les donnuts ou si il a touché des ennemis ou si le score est inférieur à -30
+	def is_end(self, current_state,reward):
+		''' Fonction qui vérifie si la partie est finie :
+		si l'agent est sur les donnuts ou si il a touché des ennemis ou si le score est inférieur à -30''' 
 		if (current_state in self.win_states) or (current_state in self.lose_states) or (reward <= -30):
 			return True
 		return False
 
 	def homer_action(self, current_state, action):
+		'''Fonction qui détermine l'action de l'agent en fonction :
+  		- de la position de l'agent
+    	- des actions possibles
+     	- des probabilités de succès'''
 		if action == "up":
 			actions_probas = [self.probas[str(current_state[1])+'_'+str(current_state[0])]["up"][a] for a in self.action]
 			return np.random.choice(self.action, p=actions_probas)
@@ -67,6 +49,7 @@ class Grid:
 			raise Exception("fct homer_action did not get a correct parameter :",action)
 
 	def get_next_state(self, current_state, action):
+		'''Fonction qui détermine le prochain état de l'agent'''
 		homer_decision = self.homer_action(current_state, action)
 		if (homer_decision == "up"):
 			next_state = (current_state[0], current_state[1] - 1)
@@ -106,24 +89,24 @@ class Agent:
 					self.Q_values[(i, j)][a] = 0
 
 	def select_action(self, exploitation = False): #voir softmax
+		'''Sélection de l'action à effectuer'''
 		action = ""
-		if np.random.uniform(0,1) > self.exploration_rate or exploitation: # exploitation
+		#si on exploite les résultats précédents :
+		if np.random.uniform(0,1) > self.exploration_rate or exploitation:
 			max_next_reward = -100
 			for a in self.actions: # On choisit la plus grande Q-value parmi les 4 de la position actuelle
 				next_reward = self.Q_values[self.current_state][a]
 				if next_reward >= max_next_reward:
 					action = a
 					max_next_reward = next_reward
-
+		#sinon on choisit une action aléatoire
 		if action == "": # exploration or no best choice
 			action = np.random.choice(self.actions)  # avec proba égale à softmax de toutes les Qvalues
 
 		return action
 
-	def get_reward_main(self):
-		return self.reward
-
 	def get_max_Q(self,state,reward):
+		'''Retourne la Q-value maximale de la position actuelle'''
 		if self.grid.is_end(state,reward):
 			return self.grid.get_reward(state)
 		max_Q = -1
@@ -133,8 +116,12 @@ class Agent:
 		return max_Q
 
 	def play_to_win(self):
+		'''Joue à la recherche de la victoire en exploitant les résultats obtenus.
+    	Joue case par case, requiert un input de la part de l'utilisateur pour continuer
+     	/!\ à n'utiliser que si on a déjà fait apprendre à l'agent'''
 		action = self.select_action(exploitation=True)
 		self.current_state, homer_decision = self.grid.get_next_state(self.current_state, action)
+		#permet de savoir si on a fait l'action demandée ou pas
 		print(f"You chose {action}, Homer did {homer_decision}")
 		self.reward += self.grid.get_reward(self.current_state)
 		if self.grid.is_end(self.current_state,self.reward):
@@ -143,6 +130,8 @@ class Agent:
 
 
 	def play_to_learn_step(self):
+		'''Exploration aléatoire par l'agent pour calculer les Q-values
+  		Joue case par case, requiert un input de la part de l'utilisateur pour continuer'''
 		if not self.grid.is_end(self.current_state,self.reward):
 			action = self.select_action()
 			self.history_states.append([self.current_state, action]) # On ajoue dans une liste une liste contenant : [position, action prise]
@@ -151,9 +140,9 @@ class Agent:
 			print(f"You chose {action}, Homer did {homer_decision}")
 			self.reward = self.reward + self.grid.get_reward(self.current_state)
 			self.reward_history = self.reward
-		else:
-			print("REWARD OF THIS GAME = ")
-			print(self.reward)
+		else: #Homer est soit sur un ennemi, soit sur un donut
+			# print("REWARD OF THIS GAME = ")
+			# print(self.reward)
 			self.reward = 0
 			reward = 0
 			previous_state = self.current_state
@@ -170,26 +159,29 @@ class Agent:
 			self.history_states = []
 		
 	def play_to_learn(self):
+		'''Exploration aléatoire par l'agent pour calculer les Q-values
+  		Joue une partie par une partie, ne requiert pas d'input'''
 		self.current_state = self.starting_state
 		self.history_states = [] # on initilise une liste 
 		over = False
 		while not over:	
-			if not self.grid.is_end(self.current_state,self.reward): # si la partie n'est pas finis
+			if not self.grid.is_end(self.current_state,self.reward): # si la partie n'est pas finie
 				action = self.select_action()
 				self.history_states.append([self.current_state, action])
 				self.current_state, homer_decision = self.grid.get_next_state(self.current_state, action)
 				self.history_states[-1].append(self.grid.get_reward(self.current_state))
 				self.reward = self.reward + self.grid.get_reward(self.current_state)
-			else:
-				print("REWARD OF THIS GAME = ")
-				print(self.reward)
+			else: #Homer est soit sur un ennemi, soit sur un donut
+				# print("REWARD OF THIS GAME = ")
+				# print(self.reward)
 				self.reward = 0
 				reward = 0
 				previous_state = self.current_state
-				for history_state in reversed(self.history_states): # on parcourt le chemin en partant de la fin 
+				for history_state in reversed(self.history_states): # on parcourt le chemin en partant de la fin...
 					state = history_state[0]
 					action = history_state[1]
 					new_reward = history_state[2]
+					# ...et on met à jour les Q-values
 					self.Q_values[state][action] += self.lr*( new_reward + self.decay_gamma*self.get_max_Q(previous_state,reward) - self.Q_values[state][action])
 					previous_state = state
 				over = True
@@ -197,6 +189,8 @@ class Agent:
 		self.history_states = []
 
 	def play_to_learn_step2(self):
+		'''Exploration aléatoire par l'agent pour calculer les Q-values
+		Joue case par case, requiert un input de la part de l'utilisateur pour continuer'''
 		action = self.select_action()
 		previous_state = self.current_state
 		self.current_state,homer_decision = self.grid.get_next_state(self.current_state, action)
@@ -204,8 +198,8 @@ class Agent:
 		self.Q_values[previous_state][action] += self.lr*( reward + self.decay_gamma*self.get_max_Q(self.current_state,self.reward) - self.Q_values[previous_state][action])
 		print(f"You chose {action}, Homer did {homer_decision}")
 		self.reward = self.reward + self.grid.get_reward(self.current_state)
-		if self.grid.is_end(self.current_state,self.reward):
+		if self.grid.is_end(self.current_state,self.reward): #Homer est soit sur un ennemi, soit sur un donut
 			self.current_state = self.starting_state
-			print("REWARD OF THIS GAME = ")
-			print(self.reward)
+			# print("REWARD OF THIS GAME = ")
+			# print(self.reward)
 			self.reward = 0
