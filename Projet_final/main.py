@@ -237,6 +237,19 @@ while running:
                 if homer_agent.lr < 0.9:
                     homer_agent.lr += 0.1
                 print(f"learning rate :{format(homer_agent.lr, '.2f')}")
+            elif event.key == py.K_COMMA: # test des taux de réussite
+                nb_reussite = 0
+                for i in range(10000):
+                    homer_agent.play_to_learn_test()
+                print("\n\n\n")
+                print(f"{homer_agent.nb_victories/100}% de réussite en aléatoire")
+                homer_agent.nb_victories = 0
+                for i in range(100000):
+                    homer_agent.play_to_learn()
+                for i in range(100000):
+                    homer_agent.play_to_win_test()
+                print(f"{homer_agent.nb_victories/100}% de réussite avec apprentissage")
+                homer_agent.nb_victories = 0
             
             #mouvements contrôlés par les flèches directionnelles du clavier
             elif event.key == py.K_LEFT: #go left
