@@ -173,7 +173,7 @@ for line in range(grid_size[1]): #on crée un tableau de probabilités dont le t
             probas = np.random.rand(4)
             probas = probas / np.sum(probas)
             i  = np.argmax(probas)
-            probas[i] += 0.5 # permet d'assurer que la probabilité de prendre la bonne action est >= 0.5
+            probas[i] += 0.8 # permet d'assurer que la probabilité de prendre la bonne action est >= 0.8
             probas = list(probas / np.sum(probas)) # normalisation
             probasDirectory[spot_id][action] = {}
             probasDirectory[spot_id][action][action] = max(probas)
@@ -224,6 +224,9 @@ while running:
             elif event.key == py.K_m:
                 print("you pressed m") # Permet de jouer plusieurs parties accélérés : les Q-values sont calculés au cours des parties
                 learning2 = True
+            elif event.key == py.K_q:
+                print("you pressed q : softmax")
+                homer_agent.play_to_learn_soft()
             elif event.key == py.K_s:
                 print("you pressed s") # arrêt des apprentissages accélérés
                 learning = False
@@ -244,9 +247,9 @@ while running:
                 print("\n\n\n")
                 print(f"{homer_agent.nb_victories/100}% de réussite en aléatoire")
                 homer_agent.nb_victories = 0
-                for i in range(100000):
+                for i in range(10000):
                     homer_agent.play_to_learn()
-                for i in range(100000):
+                for i in range(10000):
                     homer_agent.play_to_win_test()
                 print(f"{homer_agent.nb_victories/100}% de réussite avec apprentissage")
                 homer_agent.nb_victories = 0

@@ -125,7 +125,7 @@ class Agent:
 		return max_Q
 
 	def softmax(self, state):        
-		return np.random.choice(self.actions, weights = self.Q_values[state])
+		return np.random.choice(self.actions, p = self.Q_values[state])
 
 	def play_to_win(self):
 		'''Joue à la recherche de la victoire en exploitant les résultats obtenus.
@@ -237,6 +237,36 @@ class Agent:
 				self.current_state = self.starting_state
 				self.reward = 0
 				over = True
+
+	def play_to_learn_soft(self):
+		'''Exploration aléatoire par l'agent pour calculer les Q-values
+  		Joue une partie par une partie, ne requiert pas d'input'''
+		self.current_state = self.starting_state
+		self.history_states = [] # on initilise une liste 
+		over = False
+		while not over:	
+			if not self.grid.is_end(self.current_state,self.reward): # si la partie n'est pas finie
+				action = self.select_action(softmax=True)
+				self.history_states.append([self.current_state, action])
+				self.current_state, homer_decision = self.grid.get_next_state(self.current_state, action)
+				self.history_states[-1].append(self.grid.get_reward(self.current_state))
+				self.reward = self.reward + self.grid.get_reward(self.current_state)
+			else: #Homer est soit sur un ennemi, soit sur un donut
+				# print("REWARD OF THIS GAME = ")
+				# print(self.reward)
+				self.reward = 0
+				reward = 0
+				previous_state = self.current_state
+				for history_state in reversed(self.history_states): # on parcourt le chemin en partant de la fin...
+					state = history_state[0]
+					action = history_state[1]
+					new_reward = history_state[2]
+					# ...et on met à jour les Q-values
+					self.Q_values[state][action] += self.lr*( new_reward + self.decay_gamma*self.get_max_Q(previous_state,reward) - self.Q_values[state][action])
+					previous_state = state
+				over = True
+		self.current_state = self.starting_state
+		self.history_states = []
  
 
 	def play_to_learn_step2(self):
