@@ -212,6 +212,7 @@ while running:
             if event.key == py.K_a:
                 print("you pressed a") # Permer de jouer 1 partie accélérée à la fois 
                 homer_agent.play_to_learn()
+                print(homer_agent.Q_values[(1,4)]['right'])
             elif event.key == py.K_z:
                 print("you pressed z") # Permet de jouer 1 partie pas à pas : les Q-values sont calculés à la fin de la partie
                 homer_agent.play_to_learn_step()
@@ -253,7 +254,127 @@ while running:
                     homer_agent.play_to_win_test()
                 print(f"{homer_agent.nb_victories/100}% de réussite avec apprentissage")
                 homer_agent.nb_victories = 0
+            elif event.key == py.K_SPACE:
+                print("graphes")
+                learn_list1 = []
+                homer_agent.lr = 0.1
+                #test pour un lr bas
+                for i in range(1000):
+                    homer_agent.play_to_learn()
+                    learn_list1.append(homer_agent.Q_values[(1,4)]['right'])
+                f=open('f1.txt','w')
+                for ele in learn_list1:
+                    f.write(str(ele)+'\n')
+                f.close()
+                homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states, probasDirectory,reward)
+                homer_agent = mp.Agent(start, homer_grid,reward)
+                
+                learn_list2 = []
+                homer_agent.lr = 0.2
+                #test pour un lr bas
+                for i in range(1000):
+                    homer_agent.play_to_learn()
+                    learn_list2.append(homer_agent.Q_values[(1,4)]['right'])
+                f=open('f2.txt','w')
+                for ele in learn_list2:
+                    f.write(str(ele)+'\n')
+                f.close()
+                homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states, probasDirectory,reward)
+                homer_agent = mp.Agent(start, homer_grid,reward)
+                
+                learn_list3 = []
+                homer_agent.lr = 0.3
+                #test pour un lr bas
+                for i in range(1000):
+                    homer_agent.play_to_learn()
+                    learn_list3.append(homer_agent.Q_values[(1,4)]['right'])
+                f=open('f3.txt','w')
+                for ele in learn_list3:
+                    f.write(str(ele)+'\n')
+                f.close()
+                homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states, probasDirectory,reward)
+                homer_agent = mp.Agent(start, homer_grid,reward)
+                
+                learn_list4 = []
+                homer_agent.lr = 0.4
+                #test pour un lr bas
+                for i in range(1000):
+                    homer_agent.play_to_learn()
+                    learn_list4.append(homer_agent.Q_values[(1,4)]['right'])
+                f=open('f4.txt','w')
+                for ele in learn_list4:
+                    f.write(str(ele)+'\n')
+                f.close()
+                homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states, probasDirectory,reward)
+                homer_agent = mp.Agent(start, homer_grid,reward)
+                
+                learn_list5 = []
+                homer_agent.lr = 0.5
+                #test pour un lr bas
+                for i in range(1000):
+                    homer_agent.play_to_learn()
+                    learn_list5.append(homer_agent.Q_values[(1,4)]['right'])
+                f=open('f5.txt','w')
+                for ele in learn_list5:
+                    f.write(str(ele)+'\n')
+                f.close()
+                homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states, probasDirectory,reward)
+                homer_agent = mp.Agent(start, homer_grid,reward)
+                
+                learn_list6 = []
+                homer_agent.lr = 0.6
+                #test pour un lr bas
+                for i in range(1000):
+                    homer_agent.play_to_learn()
+                    learn_list6.append(homer_agent.Q_values[(1,4)]['right'])
+                f=open('f6.txt','w')
+                for ele in learn_list6:
+                    f.write(str(ele)+'\n')
+                f.close()
+                homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states, probasDirectory,reward)
+                homer_agent = mp.Agent(start, homer_grid,reward)
+                
+                learn_list7 = []
+                homer_agent.lr = 0.7
+                #test pour un lr bas
+                for i in range(1000):
+                    homer_agent.play_to_learn()
+                    learn_list7.append(homer_agent.Q_values[(1,4)]['right'])
+                f=open('f7.txt','w')
+                for ele in learn_list7:
+                    f.write(str(ele)+'\n')
+                f.close()
+                homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states, probasDirectory,reward)
+                homer_agent = mp.Agent(start, homer_grid,reward)
+                
+                learn_list8 = []
+                homer_agent.lr = 0.8
+                #test pour un lr bas
+                for i in range(1000):
+                    homer_agent.play_to_learn()
+                    learn_list8.append(homer_agent.Q_values[(1,4)]['right'])
+                f=open('f8.txt','w')
+                for ele in learn_list8:
+                    f.write(str(ele)+'\n')
+                f.close()
+                homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states, probasDirectory,reward)
+                homer_agent = mp.Agent(start, homer_grid,reward)
+                
+                learn_list9 = []
+                homer_agent.lr = 0.9
+                #test pour un lr bas
+                for i in range(1000):
+                    homer_agent.play_to_learn()
+                    learn_list9.append(homer_agent.Q_values[(1,4)]['right'])
+                f=open('f9.txt','w')
+                for ele in learn_list9:
+                    f.write(str(ele)+'\n')
+                f.close()
+                homer_grid = mp.Grid(grid_size, win_states, lose_states, obstacle_states, probasDirectory,reward)
+                homer_agent = mp.Agent(start, homer_grid,reward)
+                print("done")
             
+
             #mouvements contrôlés par les flèches directionnelles du clavier
             elif event.key == py.K_LEFT: #go left
                 homer_agent.current_state, homer_decision = homer_agent.grid.get_next_state(homer_agent.current_state, "left")
