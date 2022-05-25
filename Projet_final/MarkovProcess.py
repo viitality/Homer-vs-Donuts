@@ -147,7 +147,7 @@ class Agent:
 			action = self.select_action()
 			self.history_states.append([self.current_state, action]) # On ajoue dans une liste une liste contenant : [position, action prise]
 			self.current_state,homer_decision = self.grid.get_next_state(self.current_state, action)
-			self.history_states[-1].append(self.grid.get_reward(self.current_state)) # On ajoue dans la liste la récompense reçue
+			self.history_states[-1].append(self.grid.get_reward(self.current_state)) # On ajoute dans la liste la récompense reçue
 			print(f"You chose {action}, Homer did {homer_decision}")
 			self.reward = self.reward + self.grid.get_reward(self.current_state)
 			self.reward_history = self.reward
@@ -162,7 +162,7 @@ class Agent:
 				action = history_state[1]
 				new_reward = history_state[2]
 				print(state,action,self.get_max_Q(previous_state,reward))
-				print(self.lr*( new_reward + self.decay_gamma*self.get_max_Q(previous_state,reward) - self.Q_values[state][action]))
+				print(self.lr*(new_reward + self.decay_gamma*self.get_max_Q(previous_state,reward) - self.Q_values[state][action]))
 				self.Q_values[state][action] += self.lr*( new_reward + self.decay_gamma*self.get_max_Q(previous_state,reward) - self.Q_values[state][action])
 				previous_state = state
 
@@ -173,7 +173,7 @@ class Agent:
 		'''Exploration aléatoire par l'agent pour calculer les Q-values
   		Joue une partie par une partie, ne requiert pas d'input'''
 		self.current_state = self.starting_state
-		self.history_states = [] # on initilise une liste 
+		self.history_states = [] # on initialise une liste 
 		over = False
 		while not over:	
 			if not self.grid.is_end(self.current_state,self.reward): # si la partie n'est pas finie
@@ -193,7 +193,7 @@ class Agent:
 					action = history_state[1]
 					new_reward = history_state[2]
 					# ...et on met à jour les Q-values
-					self.Q_values[state][action] += self.lr*( new_reward + self.decay_gamma*self.get_max_Q(previous_state,reward) - self.Q_values[state][action])
+					self.Q_values[state][action] += self.lr*(new_reward + self.decay_gamma*self.get_max_Q(previous_state,reward) - self.Q_values[state][action])
 					previous_state = state
 				over = True
 		self.current_state = self.starting_state
@@ -201,6 +201,7 @@ class Agent:
   
 	def play_to_learn_test(self):
 		'''Joue une partie par une partie, ne requiert pas d'input
+		Contrairement à ce que le nom indique, cette fonction ne calcule pas les Q-values et n'apprend pas
   		permet de calculer le nombre de victoires'''
 		self.current_state = self.starting_state
 		over = False
